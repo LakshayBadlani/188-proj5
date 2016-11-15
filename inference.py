@@ -77,7 +77,10 @@ class DiscreteDistribution(dict):
         "*** YOUR CODE HERE ***"
         total = self.total()
         for y in self.items():
-            self[y[0]] = self[y[0]]/total
+            if total == 0: 
+                self[y[0]] = 0
+            else:
+                self[y[0]] = self[y[0]]/total
         return
 
 
@@ -187,16 +190,18 @@ class InferenceModule:
         """
         "*** YOUR CODE HERE ***"
         if jailPosition != ghostPosition:
-          if noisyDistance:
+          if noisyDistance != None:
             P = busters.getObservationProbability(noisyDistance, manhattanDistance(pacmanPosition, ghostPosition))
           else:
             P = 0
         else:
-          if not noisyDistance:
+          if noisyDistance == None:
             P = 1
           else:
             P = 0
         return P
+
+
 
     def setGhostPosition(self, gameState, ghostPosition, index):
         """
@@ -304,11 +309,23 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        self.beliefs.normalize()
-        for p in self.allPositions:
-            self.beliefs[p] = self.getObservationProb(observation, gameState.getPacmanPosition, self.getJailPosition)*self.beliefs[p]
+        #copy = self.beliefs.copy()
+        #if observation:
+            #for p in self.allPositions:
+                #prob = self.getObservationProb(observation, gameState.getPacmanPosition(), p, self.getJailPosition())
+                #self.beliefs[p] = prob*copy[p]
+        #if observation == None:
+            #for p in self.beliefs.items():
+                #self.beliefs[p[0]] = 0
+            #self.beliefs[self.getJailPosition()] = 1
 
         self.beliefs.normalize()
+        for p in self.allPositions:
+            self.beliefs[p] = self.getObservationProb(observation, gameState.getPacmanPosition(), p, self.getJailPosition())*self.beliefs[p]
+
+        self.beliefs.normalize()
+
+
     def elapseTime(self, gameState):
         """
         Predict beliefs in response to a time step passing from the current
