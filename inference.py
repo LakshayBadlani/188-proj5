@@ -357,10 +357,11 @@ class ParticleFilter(InferenceModule):
         self.particles for the list of particles.
         """
         self.particles = []
-        for p in self.legalPositions:
-            if len(self.particles) >= self.numParticles:
-                break
-            self.particles.append(p)
+        while len(self.particles) < self.numParticles:
+            for p in self.legalPositions:
+                if len(self.particles) >= self.numParticles:
+                    break
+                self.particles.append(p)
 
     def observeUpdate(self, observation, gameState):
         """
@@ -382,6 +383,12 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
+        new_particles = []
+        for oldPos in self.particles:
+            newPosDist = self.getPositionDistribution(gameState, oldPos)
+            new_particles.append(newPosDist.sample())
+        self.particles = new_particles
+
 
     def getBeliefDistribution(self):
         """
