@@ -469,6 +469,11 @@ class JointParticleFilter(ParticleFilter):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
+        for i in range(self.numGhosts):
+            for oldPos in self.particles:
+            newPosDist = self.getPositionDistribution(gameState, oldPos)
+            new_particles.append(newPosDist.sample())
+        self.particles = new_particles
 
     def elapseTime(self, gameState):
         """
