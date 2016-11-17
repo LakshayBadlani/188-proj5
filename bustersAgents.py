@@ -146,10 +146,6 @@ class GreedyBustersAgent(BustersAgent):
             most_likely[belief[belief.argMax()]] = belief.argMax()
         most_likely_ghost_pos = most_likely[max(most_likely.keys())]
 
-
-        distance = float("inf")
-        action = None
-
         distances = {}
         for action in legal: 
             successor = Actions.getSuccessor(gameState.getPacmanPosition(), action)
