@@ -519,10 +519,11 @@ class JointParticleFilter(ParticleFilter):
             "*** YOUR CODE HERE ***"
             newParticleList = []
             for i in range(self.numGhosts):
-                newPosDist = self.getPositionDistribution(gameState, prevGhostPositions, i, self.ghostAgents[i])
+                newPosDist = self.getPositionDistribution(gameState, newParticle, i, self.ghostAgents[i])
                 newParticleList.append(newPosDist.sample())
+            newParticle = newParticleList
             """*** END YOUR CODE HERE ***"""
-            newParticles.append(tuple(newParticleList))
+            newParticles.append(tuple(newParticle))
         self.particles = newParticles
 
 
