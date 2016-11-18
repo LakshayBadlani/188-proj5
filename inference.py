@@ -325,8 +325,6 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         new_beliefs = DiscreteDistribution()
-        for p in self.allPositions:
-            new_beliefs[p] = 0
         for oldPos in self.allPositions:
             newPosDist = self.getPositionDistribution(gameState, oldPos)
             for newPos in self.allPositions:
@@ -379,7 +377,7 @@ class ParticleFilter(InferenceModule):
         "*** YOUR CODE HERE ***"
         curr_beliefs = self.getBeliefDistribution()
         for p in self.allPositions:
-            curr_beliefs[p] = self.getObservationProb(observation, gameState.getPacmanPosition(), p, self.getJailPosition())*curr_beliefs[p]
+            curr_beliefs[p] *= self.getObservationProb(observation, gameState.getPacmanPosition(), p, self.getJailPosition())
         curr_beliefs.normalize()
         if curr_beliefs.total() != 0:
             self.particles = [curr_beliefs.sample() for _ in range(len(self.particles))]
@@ -485,13 +483,24 @@ class JointParticleFilter(ParticleFilter):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        curr_beliefs = self.getBeliefDistribution()
+        # curr_beliefs = self.getBeliefDistribution()
+        # for p in self.allPositions:
+        #     curr_beliefs[p] = self.getObservationProb(observation, gameState.getPacmanPosition(), p, self.getJailPosition())*curr_beliefs[p]
+        # curr_beliefs.normalize()
+        # if curr_beliefs.total() != 0:
+        #     self.particles = [curr_beliefs.sample() for _ in range(len(self.particles))]
+        # else:
+        #     self.initializeUniformly(gameState)
+        pac_pos = gameState.getPacmanPosition()
+        new_beliefs = DiscreteDistribution()
         for ghost_tuple in self.particles:
+            weight = 1
             for i in range(self.numGhosts):
-                curr_beliefs[ghost_tuple[i]] = self.getObservationProb(observation[i], gameState.getPacmanPosition(), ghost_tuple[i], self.getJailPosition(i))*curr_beliefs[ghost_tuple[i]]
-        curr_beliefs.normalize()
-        if curr_beliefs.total() != 0:
-            self.particles = [curr_beliefs.sample() for _ in range(len(self.particles))]
+                weight *= float(self.getObservationProb(observation[i], pac_pos, ghost_tuple[i], self.getJailPosition(i)))
+            new_beliefs[ghost_tuple] += weight
+        new_beliefs.normalize()
+        if new_beliefs.total() != 0:
+            self.particles = [new_beliefs.sample() for _ in range(len(self.particles))]
         else:
             self.initializeUniformly(gameState)
 
